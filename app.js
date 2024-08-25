@@ -42,31 +42,76 @@ let tasks = [
 
 let currentIdNumber = tasks.length;
 
-// 0 - Bajar repo, todos los ejercicios seran parte
-// del mismo proyecto js-dom-manipulation-essentials
-// Hacer una funcion que cree dinamicamente las task
-function createTaskComponent(task) {}
+window.onload = loadTasks;
 
-function loadTasks() {}
+function createTaskComponent(task) {
+  const taskList = document.querySelector("ul");
+  const taskItem = document.createElement("li");
+  taskItem.className = "task";
+  taskItem.id = task.id;
+  taskItem.innerHTML = `
+    <img src="${task.imgUrl}" alt="${task.name}" />
 
-// 1 - Funcion
-// Mostrar en un mensaje de alerta los valores del form
-function addTaskAlert(newTask) {}
+    <div class="task-information">
+      <h3>Task Owner</h3>
+      <p>${task.owner}</p>
+      <h3>Task Name</h3>
+      <p>${task.name}</p>
+      <h3>Task Description</h3>
+      <p>${task.description}</p>
+    </div>
+  `;
+  taskItem.addEventListener("click", () => deleteTaskHandler(taskItem));
+  taskList.appendChild(taskItem);
+}
 
-// 2 - Funcion
-// Agregar elemento en la lista al llenar el formulario
+function loadTasks() {
+  tasks.forEach((task) => createTaskComponent(task));
+}
 
-function addTaskHandler(event) {}
+function addTaskAlert(newTask) {
+  alert(`New Task Added: \nName: ${newTask.name}\nOwner: ${newTask.owner}\nDescription: ${newTask.description}`);
+}
 
-// 3 - Funcion
-// Eliminar elemento en la lista al hacer click sobre el elemento
-function deleteTaskHandler(taskElement) {}
+function addTaskHandler(event) {
+  event.preventDefault();
 
-// 4 - Funcion
-// Crear un boton para vaciar/eliminar todas las tareas
-function deleteAllTaskHandler() {}
+  const nameInput = document.getElementById("nameInput").value;
+  const ownerInput = document.getElementById("ownerInput").value;
+  const descriptionInput = document.getElementById("descriptionInput").value;
+  const imgUrlInput = document.getElementById("imgUrlInput").value;
 
-// 5 - Funcion
-// Si ya no quedan tareas navegar programaticamente
-// a www.youtube.com
-function redirectWhenNoTask() {}
+  const newTask = {
+    id: currentIdNumber++,
+    name: nameInput,
+    owner: ownerInput,
+    description: descriptionInput,
+    imgUrl: imgUrlInput,
+  };
+
+  tasks.push(newTask);
+  createTaskComponent(newTask);
+  addTaskAlert(newTask);
+}
+
+function deleteTaskHandler(taskElement) {
+  const taskId = parseInt(taskElement.id);
+  tasks = tasks.filter(task => task.id !== taskId);
+  taskElement.remove();
+  redirectWhenNoTask();
+}
+
+function deleteAllTaskHandler() {
+  tasks = [];
+  document.querySelector("ul").innerHTML = "";
+  redirectWhenNoTask();
+}
+
+function redirectWhenNoTask() {
+  if (tasks.length === 0) {
+    window.location.href = "https://www.youtube.com";
+  }
+}
+
+document.querySelector(".submit-button").addEventListener("click", addTaskHandler);
+document.querySelector(".clear-button").addEventListener("click", deleteAllTaskHandler);
